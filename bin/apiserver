@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require 'kajiki'
-require 'thin'
 require 'apiserver'
 
 
@@ -9,8 +8,10 @@ opts = Kajiki.preset_options(:server, {config: true})
 Kajiki.run(opts) do |cmd|
   case cmd
   when 'start'
-    Thin::Server.start(opts[:address], opts[:port]) do
-      run APIServer::Server.new(opts)
-    end
+    Rack::Server.start({
+      app: APIServer::Server.new(opts), 
+      Host: opts[:address], 
+      Port: opts[:port]
+    })
   end
 end
