@@ -1,8 +1,32 @@
 require 'json'
+require 'time'
 
 module APIServer
 
   module Helper
+
+    def parse_json(json)
+      obj = JSON.parse(json)
+      return keys_to_sym(obj)
+    end
+
+    # Convert all Hash keys to lowercase symbols
+    # @param obj [Object] any Ruby object
+    def keys_to_sym(obj)
+      case obj
+      when Array
+        obj.each do |v|
+          keys_to_sym(v)
+        end
+      when Hash
+        obj.keys.each do |k|
+          if k.class == String
+            obj[k.downcase.to_sym] = keys_to_sym(obj.delete(k))
+          end
+        end
+      end
+      return obj
+    end
 
     # Convert object into JSON, optionally pretty-format
     # @param obj [Object] any Ruby object

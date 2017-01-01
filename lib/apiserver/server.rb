@@ -1,6 +1,4 @@
 require 'sinatra/base'
-require 'apiserver/logger'
-require 'apiserver/config'
 require 'apiserver/helper'
 
 module APIServer
@@ -8,23 +6,20 @@ module APIServer
   # The Sinatra server
   class Server < Sinatra::Base
 
-    attr_reader :cmd_opts
-
-    def initialize(opts)
-      super()
-      @cmd_opts = opts
-      APIServer.load_config(opts[:config]) if opts[:config]
-    end
-
     helpers Helper
 
     configure do
       set :environment, :production
-      enable :logging
-      disable :static, :dump_errors
+      disable :static
+      c = Config.shared
+      set :dump_errors, c.dump_errors
+      set :logging, c.logging
+      APIServer.logger.info('Sinatra server configured.')
     end
 
     before do
+      tokens = Config.shared.auth_tokens
+      halt 401 unless tokens.empty? || tokens.include?(params[:auth])
     end
 
     get '/:resource' do |r|
@@ -35,11 +30,23 @@ module APIServer
       json_with_object({resource: r, id: id, data: {text: "A text.", date: Time.now()}})
     end
 
+    post '/:resource' do |r|
+      APIServer.logger.info('Incoming request received.')
+      APIServer.logger.debug("Body size: #{request.content_length} bytes")
+      request.body.rewind
+      hash = parse_json(request.body.read)
+      json_with_object({resource: r, data: hash})
+    end
+
     not_found do
+      APIServer.logger.info('Invalid request.')
+      APIServer.logger.debug("Request method and path: #{request.request_method} #{request.path}")
       json_with_object({message: 'Huh, nothing here.'})
     end
 
     error 401 do
+      APIServer.logger.info(params[:auth] ? 'Invalid auth token provided.' : 'Missing auth token.')
+      APIServer.logger.debug("Provided auth token: #{params[:auth]}") if params[:auth]
       json_with_object({message: 'Oops, need a valid auth.'})
     end
 

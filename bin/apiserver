@@ -8,9 +8,12 @@ opts = Kajiki.preset_options(:server, {config: true})
 Kajiki.run(opts) do |cmd|
   case cmd
   when 'start'
+    APIServer::Config.load_config(opts[:config]) if opts[:config]
+    require 'apiserver/server'
+    APIServer.logger.warn('API Server starting...')
     Rack::Server.start({
-      app: APIServer::Server.new(opts), 
-      Host: opts[:address], 
+      app: APIServer::Server.new,
+      Host: opts[:address],
       Port: opts[:port]
     })
   end

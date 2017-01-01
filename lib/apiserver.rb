@@ -1,1 +1,2 @@
-require 'apiserver/server'
+require 'apiserver/logger'
+require 'apiserver/config'
