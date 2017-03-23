@@ -1,5 +1,9 @@
 module APIServer
 
+  def self.config
+    Config.shared
+  end
+
   class Config
 
     # Load Ruby config file
