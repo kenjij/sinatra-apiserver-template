@@ -14,7 +14,7 @@ module APIServer
       c = Config.shared
       set :dump_errors, c.dump_errors
       set :logging, c.logging
-      APIServer.logger.info('Sinatra server configured.')
+      c.run_post_boot
     end
 
     before do

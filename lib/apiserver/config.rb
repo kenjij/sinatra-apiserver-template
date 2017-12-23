@@ -38,6 +38,15 @@ module APIServer
       @logging = false
     end
 
+    def set_post_boot(&block)
+      @post_boot_block = block
+    end
+
+    def run_post_boot
+      @post_boot_block.call if @post_boot_block
+      @post_boot_block = nil
+    end
+
   end
 
 end
