@@ -9,12 +9,9 @@ Kajiki.run(opts) do |cmd|
   case cmd
   when 'start'
     APIServer::Config.load_config(opts[:config]) if opts[:config]
+    APIServer::Handler.autoload
     require 'apiserver/server'
     APIServer.logger.warn('API Server starting...')
-    Rack::Server.start({
-      app: APIServer::Server.new,
-      Host: opts[:address],
-      Port: opts[:port]
-    })
+    APIServer::Server.run!({bind: opts[:address], port: opts[:port]})
   end
 end

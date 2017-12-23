@@ -10,6 +10,10 @@ APIServer::Config.setup do |c|
     'someSTRING1234',
     'OTHERstring987'
   ]
+  # Handlers
+  c.handler_paths = [
+    File.expand_path('../../handlers', __FILE__)
+  ]
   # HTTP server (Sinatra) settings
   c.dump_errors = true
   c.logging = true
