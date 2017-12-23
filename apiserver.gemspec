@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 
+  s.required_ruby_version = '>= 2.1'
   s.add_runtime_dependency 'kajiki', '~> 1.1'
   s.add_runtime_dependency 'sinatra', '~> 1.4'
 end
